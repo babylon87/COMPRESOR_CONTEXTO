@@ -1,0 +1,23 @@
+{
+  "name": "compresor-contexto-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["conversation", "compression", "context", "summary"],
+  "author": "",
+  "license": "ISC",
+  "description": "Backend API for conversation context compression platform",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "compromise": "^14.14.5",
+    "cors": "^2.8.5",
+    "cytoscape": "^3.33.1",
+    "express": "^5.2.1",
+    "multer": "^2.0.2"
+  }
+}
