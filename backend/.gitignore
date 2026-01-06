@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Archivos temporales
+temp/
+*.tmp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Sistema
+.DS_Store
