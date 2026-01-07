@@ -34,8 +34,11 @@ export function generateSummary(text, options = {}) {
     const sentences = doc.sentences().out('array');
     const people = doc.people().out('array');
     const topics = doc.topics().out('array');
-    const dates = doc.dates().out('array');
     const places = doc.places().out('array');
+    
+    // Extract dates using regex as compromise doesn't have .dates() in v14
+    const datePatterns = /\b(?:\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|\d{4}[-/]\d{1,2}[-/]\d{1,2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4}|(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|today|tomorrow|yesterday)\b/gi;
+    const dates = [...new Set((sanitizedText.match(datePatterns) || []))];
     
     // Generate summary
     let summary = '';
