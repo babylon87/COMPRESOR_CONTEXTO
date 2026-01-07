@@ -23,7 +23,7 @@ router.post('/generate', async (req, res) => {
     });
   } catch (error) {
     console.error('Error generating graph:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to generate graph' });
   }
 });
 
@@ -44,7 +44,7 @@ router.post('/html', async (req, res) => {
     res.json({ html });
   } catch (error) {
     console.error('Error generating graph HTML:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to generate graph HTML' });
   }
 });
 
@@ -70,7 +70,7 @@ router.post('/complete', async (req, res) => {
     });
   } catch (error) {
     console.error('Error generating complete graph:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to generate complete graph' });
   }
 });
 

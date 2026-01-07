@@ -20,7 +20,7 @@ router.get('/extensions', (req, res) => {
     res.json({ extensions });
   } catch (error) {
     console.error('Error getting extensions:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to get extensions' });
   }
 });
 
@@ -41,7 +41,7 @@ router.post('/validate', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Error validating files:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to validate files' });
   }
 });
 
@@ -69,7 +69,7 @@ router.post('/extract', async (req, res) => {
     });
   } catch (error) {
     console.error('Error extracting code:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to extract code' });
   }
 });
 
@@ -94,7 +94,7 @@ router.post('/process', async (req, res) => {
     res.json(processed);
   } catch (error) {
     console.error('Error processing file:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to process file' });
   }
 });
 

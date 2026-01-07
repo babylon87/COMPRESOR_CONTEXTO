@@ -1,6 +1,21 @@
 import nlp from 'compromise';
 
 /**
+ * Sanitize text to prevent XSS attacks
+ * @param {string} text - Text to sanitize
+ * @returns {string} Sanitized text
+ */
+function sanitizeText(text) {
+  if (typeof text !== 'string') return '';
+  
+  // Remove potential HTML/script tags
+  return text
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, ''); // Remove event handlers
+}
+
+/**
  * Generate a summary from conversation text
  * @param {string} text - The conversation text to summarize
  * @param {object} options - Options for summary generation
@@ -10,7 +25,10 @@ export function generateSummary(text, options = {}) {
   const { format = 'txt', maxLength = 500 } = options;
   
   try {
-    const doc = nlp(text);
+    // Sanitize input
+    const sanitizedText = sanitizeText(text);
+    
+    const doc = nlp(sanitizedText);
     
     // Extract key information
     const sentences = doc.sentences().out('array');
