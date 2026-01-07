@@ -290,6 +290,14 @@ Procesa documentación extensa para:
 - Límites de tamaño de entrada para prevenir ataques DoS
 - Mensajes de error que no exponen detalles internos del sistema
 
+### Recomendaciones para Producción
+
+- Implementar rate limiting a nivel de reverse proxy (nginx, API gateway) o usando `express-rate-limit`
+- Configurar HTTPS/TLS para todas las comunicaciones
+- Usar variables de entorno para configuración sensible
+- Implementar logging y monitoreo de seguridad
+- Considerar usar DOMPurify para sanitización HTML en el frontend si se expande la funcionalidad
+
 ## ⚡ Rendimiento
 
 - Procesamiento paralelo de resúmenes, grafos y código

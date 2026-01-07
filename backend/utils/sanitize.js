@@ -9,24 +9,36 @@
 
 /**
  * Sanitize text to prevent XSS attacks
- * Removes potentially dangerous HTML/script tags and event handlers
+ * 
+ * IMPORTANT: This performs multiple passes to handle nested/repeated patterns.
+ * The text is sanitized recursively until no more dangerous patterns are found.
+ * 
  * @param {string} text - Text to sanitize
  * @returns {string} Sanitized text
  */
 export function sanitizeText(text) {
   if (typeof text !== 'string') return '';
   
-  // Remove script tags (case-insensitive)
-  let sanitized = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  let sanitized = text;
+  let previousLength;
   
-  // Remove iframe tags (case-insensitive)
-  sanitized = sanitized.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-  
-  // Remove inline event handlers (onclick, onload, etc.) - case-insensitive
-  sanitized = sanitized.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
-  
-  // Remove common XSS patterns
-  sanitized = sanitized.replace(/<img[^>]+src[^>]*>/gi, ''); // Remove img tags
+  // Keep sanitizing until no more patterns are found (handles nested/repeated patterns)
+  do {
+    previousLength = sanitized.length;
+    
+    // Remove script tags (case-insensitive, handles spaces in end tags)
+    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\s*\/\s*script\s*>)<[^<]*)*<\s*\/\s*script\s*>/gi, '');
+    
+    // Remove iframe tags (case-insensitive, handles spaces in end tags)
+    sanitized = sanitized.replace(/<iframe\b[^<]*(?:(?!<\s*\/\s*iframe\s*>)<[^<]*)*<\s*\/\s*iframe\s*>/gi, '');
+    
+    // Remove inline event handlers (onclick, onload, etc.) - case-insensitive
+    sanitized = sanitized.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+    
+    // Remove common XSS patterns
+    sanitized = sanitized.replace(/<img\b[^>]*>/gi, ''); // Remove img tags
+    
+  } while (sanitized.length !== previousLength); // Repeat if content changed
   
   return sanitized;
 }

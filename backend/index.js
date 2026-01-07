@@ -62,6 +62,9 @@ app.use('/api/code', validateTextInput, codeRouter);
 app.use('/api/export', exportRouter);
 
 // Health check
+// NOTE: This endpoint is not rate-limited as it's read-only and used for monitoring.
+// For production deployments, consider adding rate limiting at the reverse proxy level
+// (e.g., nginx, API gateway) or use express-rate-limit middleware.
 app.get('/api/health', (req, res) => {
   const tempDirExists = fs.existsSync(tempDir);
   let tempDirWritable = false;
