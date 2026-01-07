@@ -2,19 +2,7 @@
  * Validate and process code files
  */
 
-/**
- * Sanitize text to prevent XSS attacks
- * @param {string} text - Text to sanitize
- * @returns {string} Sanitized text
- */
-function sanitizeText(text) {
-  if (typeof text !== 'string') return '';
-  
-  // Remove potential HTML/script tags (but preserve code blocks)
-  return text
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-}
+import { sanitizeText } from '../utils/sanitize.js';
 
 const SUPPORTED_EXTENSIONS = {
   'python': ['.py'],

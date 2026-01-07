@@ -1,19 +1,5 @@
 import nlp from 'compromise';
-
-/**
- * Sanitize text to prevent XSS attacks
- * @param {string} text - Text to sanitize
- * @returns {string} Sanitized text
- */
-function sanitizeText(text) {
-  if (typeof text !== 'string') return '';
-  
-  // Remove potential HTML/script tags
-  return text
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, ''); // Remove event handlers
-}
+import { sanitizeText, DATE_PATTERNS } from '../utils/sanitize.js';
 
 /**
  * Generate a summary from conversation text
@@ -37,8 +23,7 @@ export function generateSummary(text, options = {}) {
     const places = doc.places().out('array');
     
     // Extract dates using regex as compromise doesn't have .dates() in v14
-    const datePatterns = /\b(?:\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|\d{4}[-/]\d{1,2}[-/]\d{1,2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4}|(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)|today|tomorrow|yesterday)\b/gi;
-    const dates = [...new Set((sanitizedText.match(datePatterns) || []))];
+    const dates = [...new Set((sanitizedText.match(DATE_PATTERNS) || []))];
     
     // Generate summary
     let summary = '';

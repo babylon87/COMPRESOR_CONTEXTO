@@ -14,6 +14,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Configuration constants
+const MAX_TEXT_LENGTH = parseInt(process.env.MAX_TEXT_LENGTH) || 10000000; // 10 million characters
+
 // Ensure temp directory exists
 const tempDir = path.join(__dirname, 'temp');
 if (!fs.existsSync(tempDir)) {
@@ -25,11 +28,10 @@ const validateTextInput = (req, res, next) => {
   const { text } = req.body;
   
   if (text && typeof text === 'string') {
-    const maxLength = 10000000; // 10 million characters
-    if (text.length > maxLength) {
+    if (text.length > MAX_TEXT_LENGTH) {
       return res.status(400).json({ 
         error: 'Text input too large', 
-        message: `Maximum text length is ${maxLength} characters` 
+        message: `Maximum text length is ${MAX_TEXT_LENGTH} characters` 
       });
     }
   }

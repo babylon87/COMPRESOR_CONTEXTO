@@ -1,19 +1,5 @@
 import nlp from 'compromise';
-
-/**
- * Sanitize text to prevent XSS attacks
- * @param {string} text - Text to sanitize
- * @returns {string} Sanitized text
- */
-function sanitizeText(text) {
-  if (typeof text !== 'string') return '';
-  
-  // Remove potential HTML/script tags
-  return text
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, ''); // Remove event handlers
-}
+import { sanitizeText } from '../utils/sanitize.js';
 
 /**
  * Extract concepts and relationships from text to create a graph
