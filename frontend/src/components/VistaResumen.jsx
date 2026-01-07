@@ -4,9 +4,14 @@ export default function VistaResumen({ summary, format, stats, loading }) {
   const [viewFormat, setViewFormat] = useState('preview');
 
   const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    const htmlEscapeMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return text.replace(/[&<>"']/g, char => htmlEscapeMap[char]);
   };
 
   const formatText = (text) => {
