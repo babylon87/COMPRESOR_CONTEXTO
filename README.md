@@ -177,9 +177,12 @@ COMPRESOR_CONTEXTO/
 
 ### Variables de Entorno
 
-**Backend** (opcional)
+**Backend** (.env)
 ```env
 PORT=3001
+NODE_ENV=development
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+TEMP_FILE_CLEANUP_MINUTES=10
 ```
 
 **Frontend** (.env)
@@ -282,6 +285,10 @@ Procesa documentación extensa para:
 - No se almacenan conversaciones en el servidor
 - Los archivos temporales se eliminan automáticamente
 - Sin dependencias de APIs externas para procesamiento básico
+- Validación y sanitización de entrada para prevenir ataques XSS
+- Configuración de CORS para controlar orígenes permitidos
+- Límites de tamaño de entrada para prevenir ataques DoS
+- Mensajes de error que no exponen detalles internos del sistema
 
 ## ⚡ Rendimiento
 

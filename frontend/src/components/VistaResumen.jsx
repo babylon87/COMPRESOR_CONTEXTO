@@ -3,6 +3,12 @@ import { useState, useEffect } from 'react';
 export default function VistaResumen({ summary, format, stats, loading }) {
   const [viewFormat, setViewFormat] = useState('preview');
 
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
   const formatText = (text) => {
     if (!text) return '';
     
@@ -15,17 +21,17 @@ export default function VistaResumen({ summary, format, stats, loading }) {
       .split('\n')
       .map(line => {
         if (line.startsWith('# ')) {
-          return `<h1 class="text-2xl font-bold mt-4 mb-2">${line.substring(2)}</h1>`;
+          return `<h1 class="text-2xl font-bold mt-4 mb-2">${escapeHtml(line.substring(2))}</h1>`;
         } else if (line.startsWith('## ')) {
-          return `<h2 class="text-xl font-bold mt-3 mb-2">${line.substring(3)}</h2>`;
+          return `<h2 class="text-xl font-bold mt-3 mb-2">${escapeHtml(line.substring(3))}</h2>`;
         } else if (line.startsWith('### ')) {
-          return `<h3 class="text-lg font-bold mt-2 mb-1">${line.substring(4)}</h3>`;
+          return `<h3 class="text-lg font-bold mt-2 mb-1">${escapeHtml(line.substring(4))}</h3>`;
         } else if (line.startsWith('- ')) {
-          return `<li class="ml-4">${line.substring(2)}</li>`;
+          return `<li class="ml-4">${escapeHtml(line.substring(2))}</li>`;
         } else if (line.trim() === '') {
           return '<br/>';
         }
-        return `<p class="mb-2">${line}</p>`;
+        return `<p class="mb-2">${escapeHtml(line)}</p>`;
       })
       .join('');
   };
