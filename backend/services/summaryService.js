@@ -8,102 +8,104 @@ import nlp from 'compromise';
  */
 export function generateSummary(text, options = {}) {
   const { format = 'txt', maxLength = 500 } = options;
-  
+
   try {
-    const doc = nlp(text);
-    
-    // Extract key information
-    const sentences = doc.sentences().out('array');
-    const people = doc.people().out('array');
-    const topics = doc.topics().out('array');
-    const dates = doc.dates().out('array');
-    const places = doc.places().out('array');
-    
-    // Generate summary
+    const doc = nlp(text || '');
+
+    // Sentences (fallback a separación simple si la librería no las devuelve)
+    const sentences = (doc && typeof doc.sentences === 'function')
+      ? (doc.sentences().out && doc.sentences().out('array') || [])
+      : ((text || '').match(/[^.!?]+[.!?]*/g) || []).map(s => s.trim()).filter(Boolean);
+
+    // Helper seguro para extraer arrays desde métodos de compromise
+    const safeExtract = (accessor) => {
+      try {
+        if (!accessor) return [];
+        const obj = accessor();
+        if (!obj) return [];
+        if (typeof obj.out === 'function') {
+          const out = obj.out('array');
+          return Array.isArray(out) ? out : [];
+        }
+        // Si el objeto ya es un array/valor simple
+        if (Array.isArray(obj)) return obj;
+        return [];
+      } catch (e) {
+        return [];
+      }
+    };
+
+    const people = safeExtract(() => doc.people ? doc.people() : null);
+    const topics = safeExtract(() => doc.topics ? doc.topics() : null);
+    const dates = safeExtract(() => doc.dates ? doc.dates() : null);
+    const places = safeExtract(() => doc.places ? doc.places() : null);
+
+    // Word count calculado manualmente para no depender de doc.wordCount()
+    const wordCount = (text || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .length;
+
+    // Generar summary
     let summary = '';
-    
-    // Add header
     summary += '# Resumen de Conversación\n\n';
-    
-    // Add participants if found
+
     if (people.length > 0) {
-      summary += `## Participantes:\n`;
-      const uniquePeople = [...new Set(people)];
-      uniquePeople.forEach(person => {
-        summary += `- ${person}\n`;
-      });
+      summary += '## Participantes:\n';
+      [...new Set(people)].forEach(p => { summary += `- ${p}\n`; });
       summary += '\n';
     }
-    
-    // Add key topics
+
     if (topics.length > 0) {
-      summary += `## Temas Principales:\n`;
-      const uniqueTopics = [...new Set(topics)].slice(0, 10);
-      uniqueTopics.forEach(topic => {
-        summary += `- ${topic}\n`;
-      });
+      summary += '## Temas Principales:\n';
+      [...new Set(topics)].slice(0, 10).forEach(t => { summary += `- ${t}\n`; });
       summary += '\n';
     }
-    
-    // Add temporal context
+
     if (dates.length > 0) {
-      summary += `## Referencias Temporales:\n`;
-      const uniqueDates = [...new Set(dates)].slice(0, 5);
-      uniqueDates.forEach(date => {
-        summary += `- ${date}\n`;
-      });
+      summary += '## Referencias Temporales:\n';
+      [...new Set(dates)].slice(0, 5).forEach(d => { summary += `- ${d}\n`; });
       summary += '\n';
     }
-    
-    // Add location context
+
     if (places.length > 0) {
-      summary += `## Lugares Mencionados:\n`;
-      const uniquePlaces = [...new Set(places)].slice(0, 5);
-      uniquePlaces.forEach(place => {
-        summary += `- ${place}\n`;
-      });
+      summary += '## Lugares Mencionados:\n';
+      [...new Set(places)].slice(0, 5).forEach(pl => { summary += `- ${pl}\n`; });
       summary += '\n';
     }
-    
-    // Add content summary
-    summary += `## Resumen del Contenido:\n\n`;
-    
-    // Select most relevant sentences (first, last, and some middle ones)
-    const numSentences = Math.min(sentences.length, 10);
-    const selectedIndices = new Set();
-    
-    if (sentences.length > 0) {
-      selectedIndices.add(0); // First sentence
-      if (sentences.length > 1) {
-        selectedIndices.add(sentences.length - 1); // Last sentence
+
+    summary += '## Resumen del Contenido:\n\n';
+
+    // Selección de oraciones de forma segura
+    let selectedSentences = [];
+    if (!sentences || sentences.length === 0) {
+      selectedSentences = [(text || '').substring(0, maxLength)];
+    } else {
+      const numSentences = Math.min(sentences.length, 10);
+      const indices = new Set();
+      indices.add(0);
+      if (sentences.length > 1) indices.add(sentences.length - 1);
+      const step = Math.max(1, Math.floor(sentences.length / numSentences));
+      for (let i = step; i < sentences.length - 1 && indices.size < numSentences; i += step) {
+        indices.add(i);
       }
-      
-      // Add some middle sentences
-      const step = Math.floor(sentences.length / numSentences);
-      for (let i = step; i < sentences.length - 1; i += step) {
-        selectedIndices.add(i);
-        if (selectedIndices.size >= numSentences) break;
-      }
+      selectedSentences = Array.from(indices).sort((a, b) => a - b).map(i => sentences[i]).filter(Boolean);
     }
-    
-    const selectedSentences = Array.from(selectedIndices)
-      .sort((a, b) => a - b)
-      .map(i => sentences[i]);
-    
+
     summary += selectedSentences.join(' ');
-    
-    // Add statistics
+
+    // Estadísticas
     summary += '\n\n## Estadísticas:\n';
-    summary += `- Total de palabras: ${doc.wordCount()}\n`;
-    summary += `- Total de oraciones: ${sentences.length}\n`;
+    summary += `- Total de palabras: ${wordCount}\n`;
+    summary += `- Total de oraciones: ${sentences.length || 0}\n`;
     summary += `- Temas identificados: ${[...new Set(topics)].length}\n`;
-    
+
     return {
       summary,
       format,
       stats: {
-        wordCount: doc.wordCount(),
-        sentenceCount: sentences.length,
+        wordCount,
+        sentenceCount: sentences.length || 0,
         peopleCount: [...new Set(people)].length,
         topicsCount: [...new Set(topics)].length,
         datesCount: [...new Set(dates)].length,
@@ -117,7 +119,7 @@ export function generateSummary(text, options = {}) {
       }
     };
   } catch (error) {
-    throw new Error(`Error generating summary: ${error.message}`);
+    throw new Error(`Error generating summary: ${error && error.message ? error.message : String(error)}`);
   }
 }
 
@@ -129,12 +131,11 @@ export function generateSummary(text, options = {}) {
  */
 export function formatSummary(summary, format) {
   if (format === 'txt') {
-    // Convert markdown to plain text
     return summary
-      .replace(/^#+\s+/gm, '')  // Remove markdown headers
-      .replace(/\*\*/g, '')     // Remove bold
-      .replace(/\*/g, '')       // Remove italic
-      .replace(/`/g, '');       // Remove code
+      .replace(/^#+\s+/gm, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/`/g, '');
   }
-  return summary; // Return as markdown
+  return summary;
 }
