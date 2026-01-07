@@ -1,4 +1,5 @@
 import nlp from 'compromise';
+import { sanitizeText, DATE_PATTERNS } from '../utils/sanitize.js';
 
 /**
  * Generate a summary from conversation text
@@ -10,14 +11,19 @@ export function generateSummary(text, options = {}) {
   const { format = 'txt', maxLength = 500 } = options;
   
   try {
-    const doc = nlp(text);
+    // Sanitize input
+    const sanitizedText = sanitizeText(text);
+    
+    const doc = nlp(sanitizedText);
     
     // Extract key information
     const sentences = doc.sentences().out('array');
     const people = doc.people().out('array');
     const topics = doc.topics().out('array');
-    const dates = doc.dates().out('array');
     const places = doc.places().out('array');
+    
+    // Extract dates using regex as compromise doesn't have .dates() in v14
+    const dates = [...new Set((sanitizedText.match(DATE_PATTERNS) || []))];
     
     // Generate summary
     let summary = '';

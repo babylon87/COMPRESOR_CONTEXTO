@@ -2,6 +2,8 @@
  * Validate and process code files
  */
 
+import { sanitizeText } from '../utils/sanitize.js';
+
 const SUPPORTED_EXTENSIONS = {
   'python': ['.py'],
   'javascript': ['.js', '.jsx', '.mjs'],
@@ -72,11 +74,14 @@ export function getLanguageFromExtension(extension) {
 export function extractCodeBlocks(text) {
   const codeBlocks = [];
   
+  // Sanitize input
+  const sanitizedText = sanitizeText(text);
+  
   // Match markdown code blocks with language
   const markdownRegex = /```(\w+)?\n([\s\S]*?)```/g;
   let match;
   
-  while ((match = markdownRegex.exec(text)) !== null) {
+  while ((match = markdownRegex.exec(sanitizedText)) !== null) {
     const language = match[1] || 'text';
     const code = match[2].trim();
     
@@ -91,7 +96,7 @@ export function extractCodeBlocks(text) {
   }
   
   // Also detect indented code blocks
-  const lines = text.split('\n');
+  const lines = sanitizedText.split('\n');
   let currentBlock = null;
   let blockStart = 0;
   

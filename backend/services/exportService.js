@@ -86,14 +86,19 @@ export async function createExportZip(exportData, outputPath) {
 /**
  * Clean up temporary files
  * @param {string} filePath - Path to file to delete
+ * @returns {boolean} True if cleanup was successful
  */
 export function cleanupTempFile(filePath) {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
+      console.log(`Cleaned up temp file: ${filePath}`);
+      return true;
     }
+    return false;
   } catch (error) {
     console.error('Error cleaning up temp file:', error);
+    return false;
   }
 }
 

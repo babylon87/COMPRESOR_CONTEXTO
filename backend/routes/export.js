@@ -55,14 +55,15 @@ router.post('/create', async (req, res) => {
       message: 'Export ZIP created successfully'
     });
 
-    // Schedule cleanup after 10 minutes
+    // Schedule cleanup after configurable time (default 10 minutes)
+    const cleanupTimeout = parseInt(process.env.TEMP_FILE_CLEANUP_MINUTES) || 10;
     setTimeout(() => {
       cleanupTempFile(zipPath);
-    }, 10 * 60 * 1000);
+    }, cleanupTimeout * 60 * 1000);
 
   } catch (error) {
     console.error('Error creating export:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to create export' });
   }
 });
 
@@ -93,7 +94,7 @@ router.post('/preview', async (req, res) => {
     res.json(preview);
   } catch (error) {
     console.error('Error creating preview:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to create preview' });
   }
 });
 

@@ -26,7 +26,7 @@ router.post('/generate', async (req, res) => {
     });
   } catch (error) {
     console.error('Error generating summary:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to generate summary' });
   }
 });
 
@@ -52,7 +52,7 @@ router.post('/preview', async (req, res) => {
     });
   } catch (error) {
     console.error('Error generating preview:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to generate preview' });
   }
 });
 

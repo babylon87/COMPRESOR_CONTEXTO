@@ -1,4 +1,5 @@
 import nlp from 'compromise';
+import { sanitizeText } from '../utils/sanitize.js';
 
 /**
  * Extract concepts and relationships from text to create a graph
@@ -7,7 +8,10 @@ import nlp from 'compromise';
  */
 export function generateGraphData(text) {
   try {
-    const doc = nlp(text);
+    // Sanitize input
+    const sanitizedText = sanitizeText(text);
+    
+    const doc = nlp(sanitizedText);
     
     // Extract entities
     const people = doc.people().out('array');

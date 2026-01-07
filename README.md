@@ -177,9 +177,12 @@ COMPRESOR_CONTEXTO/
 
 ### Variables de Entorno
 
-**Backend** (opcional)
+**Backend** (.env)
 ```env
 PORT=3001
+NODE_ENV=development
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+TEMP_FILE_CLEANUP_MINUTES=10
 ```
 
 **Frontend** (.env)
@@ -282,6 +285,18 @@ Procesa documentación extensa para:
 - No se almacenan conversaciones en el servidor
 - Los archivos temporales se eliminan automáticamente
 - Sin dependencias de APIs externas para procesamiento básico
+- Validación y sanitización de entrada para prevenir ataques XSS
+- Configuración de CORS para controlar orígenes permitidos
+- Límites de tamaño de entrada para prevenir ataques DoS
+- Mensajes de error que no exponen detalles internos del sistema
+
+### Recomendaciones para Producción
+
+- Implementar rate limiting a nivel de reverse proxy (nginx, API gateway) o usando `express-rate-limit`
+- Configurar HTTPS/TLS para todas las comunicaciones
+- Usar variables de entorno para configuración sensible
+- Implementar logging y monitoreo de seguridad
+- Considerar usar DOMPurify para sanitización HTML en el frontend si se expande la funcionalidad
 
 ## ⚡ Rendimiento
 
